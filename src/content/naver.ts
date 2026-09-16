@@ -1,40 +1,44 @@
-import { EditorObserver } from "./editor-observer";
+import { UrlObserver } from "./common/observer/url-observer";
+import { EditorMutationObserver } from "./common/observer/editor-mutation-observer";
+import { runAfterRender } from "./common/wrap-run-after-render";
+import { ContentMessageBus } from "./common/content-message-bus";
+import { DOM_CHANGED } from "../core/bus-tab-id";
+import { tryCatch } from "../common/wrapper";
 
-const NAVER_EDITOR_SELECTOR =
-    'div.workseditor-content[class="workseditor-content"][contenteditable="true"]';
+const NAVER_EDITOR_URL = "mail.naver.com/v2/new";
+    const NAVER_EDITOR_SELECTOR =
+        'div.workseditor-content[class="workseditor-content"][contenteditable="true"]';
 
-function startNaverObserver(): void {
-    if (window.self === window.top) {
-        return;
+tryCatch(() => {
+    function startNaverEditorObserver(): void {
+        const messageBus = new ContentMessageBus(DOM_CHANGED);
+        const naverObserver = new UrlObserver(
+            () => {
+                const isFoundEditor = naverObserver.getUrl()?.includes(NAVER_EDITOR_URL);
+                messageBus.send(JSON.stringify({ isFoundEditor }));
+            },
+        );
+        naverObserver.start();
     }
 
-    if (!document.querySelector(NAVER_EDITOR_SELECTOR)) {
-        return;
-    }
+    runAfterRender(startNaverEditorObserver);
+});
 
-    const naverObserver = new EditorObserver(NAVER_EDITOR_SELECTOR);
-    naverObserver.start();
+tryCatch(() => {
+    function startNaverObserver(): void {
+        if (window.self === window.top) {
+            return;
+        }
 
-    setInterval(() => {
-        console.log(naverObserver.getEditor());
-    }, 1000);
-}
+        if (!document.querySelector(NAVER_EDITOR_SELECTOR)) {
+            return;
+        }
 
-function runAfterRender(callback: () => void): void {
-    const schedule = () => {
-        requestAnimationFrame(() => {
-            requestAnimationFrame(callback);
+        const naverObserver = new EditorMutationObserver(NAVER_EDITOR_SELECTOR, () => {
+            
         });
-    };
-
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", schedule, {
-            once: true
-        });
-        return;
+        naverObserver.start();
     }
 
-    schedule();
-}
-
-runAfterRender(startNaverObserver);
+    runAfterRender(startNaverObserver);
+});

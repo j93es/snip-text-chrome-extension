@@ -1,11 +1,13 @@
-export class EditorObserver {
+export class EditorPollingObserver {
     private selector: string;
     private currentEditor: HTMLElement | null;
     private intervalId: number | null = null;
+    private editorChangedCallback: () => void;
 
-    constructor(selector: string) {
+    constructor(selector: string, changedCallback: () => void) {
         this.selector = selector;
         this.currentEditor = null;
+        this.editorChangedCallback = changedCallback;
     }
 
     start() {
@@ -39,10 +41,7 @@ export class EditorObserver {
         if (editor !== this.currentEditor) {
             this.currentEditor = editor;
 
-            console.log(
-                "Editor changed:",
-                editor
-            );
+            this.editorChangedCallback();
         }
     }
 
