@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Snip Text",
+  "version": "1.0",
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["./src/content/gmail.js"],
+      "type": "module"
+    },
+    {
+      "matches": ["https://mail.naver.com/*"],
+      "js": ["./src/content/naver.js"],
+      "type": "module",
+      "all_frames": true,
+      "match_origin_as_fallback": true
+    }
+  ],
+  "action": {
+    "default_popup": "./src/popup/index.html"
+  }
+}
