@@ -1,28 +1,31 @@
 export class EditorObserver {
     private selector: string;
     private currentEditor: HTMLElement | null;
-    private observer: MutationObserver;
+    private intervalId: number | null = null;
 
     constructor(selector: string) {
         this.selector = selector;
         this.currentEditor = null;
-
-        this.observer = new MutationObserver(() => {
-            this.checkEditor();
-        });
     }
 
     start() {
-        this.observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
+        if (this.intervalId !== null) {
+            return;
+        }
 
         this.checkEditor();
+        this.intervalId = window.setInterval(() => {
+            this.checkEditor();
+        }, 250);
     }
 
     stop() {
-        this.observer.disconnect();
+        if (this.intervalId !== null) {
+            window.clearInterval(this.intervalId);
+            this.intervalId = null;
+        }
+
+        this.currentEditor = null;
     }
 
     checkEditor() {
@@ -30,7 +33,7 @@ export class EditorObserver {
             document.querySelectorAll<HTMLElement>(this.selector);
 
         const editor = [...editors].find(
-            editor => editor.offsetParent !== null
+            editor => editor.getClientRects().length > 0
         ) ?? null;
 
         if (editor !== this.currentEditor) {
