@@ -1,3 +1,0 @@
-const DOM_CHANGED = "DOM_CHANGED";
-
-export { DOM_CHANGED };

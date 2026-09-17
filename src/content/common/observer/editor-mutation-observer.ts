@@ -1,50 +1,45 @@
 export class EditorMutationObserver {
-    private selector: string;
-    private currentEditor: HTMLElement | null;
-    private observer: MutationObserver;
-    private editorChangedCallback: () => void;
+  private selector: string;
+  private currentEditor: HTMLElement | null | undefined;
+  private observer: MutationObserver;
+  private editorChangedCallback: () => void;
 
-    constructor(selector: string, changedCallback: () => void) {
-        this.selector = selector;
-        this.currentEditor = null;
-        this.editorChangedCallback = changedCallback;
+  constructor(selector: string, changedCallback: () => void) {
+    this.selector = selector;
+    this.currentEditor = undefined;
+    this.editorChangedCallback = changedCallback;
 
-        this.observer = new MutationObserver(() => {
-            this.checkEditor();
-        });
+    this.observer = new MutationObserver(() => {
+      this.checkEditor();
+    });
+  }
+
+  start() {
+    this.checkEditor();
+    this.observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  stop() {
+    this.observer.disconnect();
+  }
+
+  checkEditor() {
+    const editors = document.querySelectorAll<HTMLElement>(this.selector);
+
+    const editor =
+      [...editors].find((editor) => editor.offsetParent !== null) ?? null;
+
+    if (editor !== this.currentEditor) {
+      this.currentEditor = editor;
+
+      this.editorChangedCallback();
     }
+  }
 
-    start() {
-        this.observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-
-        this.checkEditor();
-    }
-
-    stop() {
-        this.observer.disconnect();
-    }
-
-    checkEditor() {
-        const editors =
-            document.querySelectorAll<HTMLElement>(this.selector);
-
-        const editor = [...editors].find(
-            editor => editor.offsetParent !== null
-        ) ?? null;
-
-        if (editor !== this.currentEditor) {
-
-            this.currentEditor = editor;
-
-            this.editorChangedCallback();
-        }
-    }
-
-    getEditor() {
-        return this.currentEditor;
-    }
+  getEditor() {
+    return this.currentEditor;
+  }
 }
-
