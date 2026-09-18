@@ -1,8 +1,16 @@
+import { sendMessage } from "../common/message-bus";
+
 document?.getElementById("sendButton")?.addEventListener("click", async () => {
-  const response = await chrome.runtime.sendMessage({
-    type: "FROM_POPUP",
-    message: "Popup에서 보낸 메시지입니다.",
+  const response = await sendMessage({
+    src: "POPUP",
+    dst: "BACKGROUND",
+    path: "/editor/insert-text",
+    method: "PUT",
+    data: { text: "hello" },
   });
 
-  console.log("Background 응답:", response);
+  const elem = document.getElementById("console");
+  if (elem) {
+    elem.textContent = JSON.stringify(response);
+  }
 });

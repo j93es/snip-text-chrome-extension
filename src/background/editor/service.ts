@@ -1,9 +1,7 @@
 import type { EditorStatus } from "../../core/editor-status";
+import { sendMessage, sendToActiveTab } from "../../common/message-bus";
 import type { MessageResponse } from "../../core/message-types";
-import { MessageBus } from "../../common/message-bus";
 import { repository } from "./repository";
-
-const bus = new MessageBus("BACKGROUND");
 
 const getEditorStatus = async (
   venderName: string,
@@ -11,16 +9,13 @@ const getEditorStatus = async (
   return (await repository.read(venderName)) ?? undefined;
 };
 
-const insertText = async (
-  venderName: string,
-  text: string,
-): Promise<MessageResponse | void> => {
-  const res = await bus.send({
+const insertText = async (text: string): Promise<MessageResponse | void> => {
+  const res = await sendToActiveTab({
     src: "BACKGROUND",
     dst: "CONTENT",
     method: "PUT",
     path: "/editor/insert-text",
-    data: { venderName, text },
+    data: { text },
   });
 
   return res;
@@ -32,7 +27,7 @@ const updateEditorStatus = async (
 ): Promise<void> => {
   await repository.update(venderName, status);
 
-  await bus.send({
+  await sendMessage({
     src: "BACKGROUND",
     dst: "POPUP",
     method: "PUT",

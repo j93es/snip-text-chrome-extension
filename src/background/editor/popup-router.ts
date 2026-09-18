@@ -8,11 +8,7 @@ const popupRouter = async (
     return;
   }
 
-  if (req.src !== "POPUP") {
-    return;
-  }
-
-  if (req.dst !== "BACKGROUND") {
+  if (req.src !== "POPUP" || req.dst !== "BACKGROUND") {
     return;
   }
 
@@ -40,13 +36,6 @@ const popupRouter = async (
   }
 
   if (req.method === "PUT" && req.path === "/editor/insert-text") {
-    if (!req.data.venderName) {
-      return {
-        statusCode: 400,
-        data: { msg: "venderName is empty." },
-      };
-    }
-
     if (!req.data.text) {
       return {
         statusCode: 400,
@@ -54,7 +43,7 @@ const popupRouter = async (
       };
     }
 
-    const res = await service.insertText(req.data.venderName, req.data.text);
+    const res = await service.insertText(req.data.text);
 
     return res;
   }
@@ -64,7 +53,6 @@ export const router = async (
   data: MessageRequest,
 ): Promise<MessageResponse | void> => {
   const res = await popupRouter(data);
-  if (res) {
-    return res;
-  }
+
+  return res;
 };

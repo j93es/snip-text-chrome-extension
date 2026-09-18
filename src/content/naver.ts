@@ -1,22 +1,27 @@
 import { UrlObserver } from "./common/observer/url-observer";
 import { EditorMutationObserver } from "./common/observer/editor-mutation-observer";
 import { runAfterRender } from "./common/wrap-run-after-render";
-import { MessageBus } from "../common/message-bus";
+import { sendMessage, listenMessage } from "../common/message-bus";
 import type { MessageRequest, MessageResponse } from "../core/message-types";
+import { insertTextToEditor } from "./common/insert-text";
 
 const NAVER_EDITOR_URL = "mail.naver.com/v2/new";
 const NAVER_EDITOR_SELECTOR =
   'div.workseditor-content[class="workseditor-content"][contenteditable="true"]';
-const messageBus = new MessageBus("CONTENT");
+let naverEditorObserver: EditorMutationObserver;
 
 function startNaverObserver(): void {
   if (window.self !== window.top) {
     return;
   }
 
+  if (!window.location.href.includes(NAVER_EDITOR_URL)) {
+    return;
+  }
+
   const naverObserver = new UrlObserver(() => {
     const isEditorRendered = naverObserver.getUrl()?.includes(NAVER_EDITOR_URL);
-    const res = messageBus.send({
+    const res = sendMessage({
       src: "CONTENT",
       dst: "BACKGROUND",
       path: "/editor/update-status",
@@ -41,49 +46,51 @@ function startNaverEditorObserver(): void {
     return;
   }
 
-  const naverEditorObserver = new EditorMutationObserver(
+  naverEditorObserver = new EditorMutationObserver(
     NAVER_EDITOR_SELECTOR,
     () => {
-      console.log(naverEditorObserver.getEditor());
+      // console.log(naverEditorObserver.getEditor());
     },
   );
 
-  messageBus.on((req: MessageRequest): MessageResponse | void => {
-    if (req.src !== "BACKGROUND") {
-      return;
-    }
+  // background -> content
+  listenMessage(
+    async (req: MessageRequest): Promise<MessageResponse | void> => {
+      if (req.src !== "BACKGROUND" || req.dst !== "CONTENT" || !req.data.text) {
+        return {
+          statusCode: 400,
+          data: { msg: "invalid field" },
+        };
+      }
 
-    if (req.dst !== "CONTENT") {
-      return;
-    }
+      // 경로별로 유효성 검사 분기
+      if (req.method === "PUT" && req.path === "/editor/insert-text") {
+        const editor = naverEditorObserver?.getEditor();
+        const { prevText, isInserted } = insertTextToEditor(
+          editor,
+          req.data.text,
+        );
 
-    if (!req.data.venderName) {
-      return {
-        statusCode: 400,
-        data: { msg: "venderName is empty." },
-      };
-    }
+        if (!isInserted) {
+          return {
+            statusCode: 404,
+            data: { msg: "Naver editor not found." },
+          };
+        }
 
-    if (!req.data.text) {
-      return {
-        statusCode: 400,
-        data: { msg: "status is empty." },
-      };
-    }
-
-    if (req.data.venderName !== "NAVER") {
-      return;
-    }
-
-    if (req.method === "PUT" && req.path === "/editor/insert-text") {
-      console.log("naver observer", req.data.text);
-
-      return {
-        statusCode: 400,
-        data: { prevText: "hello world" },
-      };
-    }
-  });
+        return {
+          statusCode: 200,
+          data: {
+            prevText: prevText,
+            insertedText: req.data.text,
+            currentText:
+              editor instanceof HTMLElement ? (editor.textContent ?? "") : "",
+            isInserted: isInserted,
+          },
+        };
+      }
+    },
+  );
 
   naverEditorObserver.start();
 }

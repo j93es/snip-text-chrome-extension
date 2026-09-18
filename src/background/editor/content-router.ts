@@ -8,11 +8,7 @@ const contentRouter = async (
     return;
   }
 
-  if (req.src !== "CONTENT") {
-    return;
-  }
-
-  if (req.dst !== "BACKGROUND") {
+  if (req.src !== "CONTENT" || req.dst !== "BACKGROUND") {
     return;
   }
 

@@ -1,9 +1,8 @@
 import { EditorMutationObserver } from "./common/observer/editor-mutation-observer";
 import { runAfterRender } from "./common/wrap-run-after-render";
-import { MessageBus } from "../common/message-bus";
+import { sendMessage, listenMessage } from "../common/message-bus";
 import type { MessageRequest, MessageResponse } from "../core/message-types";
-
-const messageBus = new MessageBus("CONTENT");
+import { insertTextToEditor } from "./common/insert-text";
 
 const GMAIL_EDITOR_SELECTOR =
   'div[contenteditable="true"][g_editable="true"][role="textbox"][aria-multiline="true"]';
@@ -13,7 +12,7 @@ function startGmailObserver(): void {
     GMAIL_EDITOR_SELECTOR,
     () => {
       const isEditorRendered = gmailObserver.getEditor() !== null;
-      const res = messageBus.send({
+      const res = sendMessage({
         src: "CONTENT",
         dst: "BACKGROUND",
         path: "/editor/update-status",
@@ -27,42 +26,45 @@ function startGmailObserver(): void {
     },
   );
 
-  messageBus.on((req: MessageRequest): MessageResponse | void => {
-    if (req.src !== "BACKGROUND") {
-      return;
-    }
+  // background -> content
+  listenMessage(
+    async (req: MessageRequest): Promise<MessageResponse | void> => {
+      if (req.src !== "BACKGROUND" || req.dst !== "CONTENT" || !req.data.text) {
+        return {
+          statusCode: 400,
+          data: { msg: "Invalid field" },
+        };
+      }
 
-    if (req.dst !== "CONTENT") {
-      return;
-    }
+      // 경로별로 유효성 검사 분기
+      if (req.method === "PUT" && req.path === "/editor/insert-text") {
+        const editor = gmailObserver.getEditor();
+        const { isInserted, prevText } = insertTextToEditor(
+          editor,
+          req.data.text,
+        );
 
-    if (!req.data.venderName) {
-      return {
-        statusCode: 400,
-        data: { msg: "venderName is empty." },
-      };
-    }
+        if (!isInserted) {
+          return {
+            statusCode: 404,
+            data: { msg: "Gmail editor not found." },
+          };
+        }
 
-    if (!req.data.text) {
-      return {
-        statusCode: 400,
-        data: { msg: "status is empty." },
-      };
-    }
+        return {
+          statusCode: 200,
+          data: {
+            prevText: prevText,
+            insertedText: req.data.text,
+            currentText:
+              editor instanceof HTMLElement ? (editor.textContent ?? "") : "",
+            isInserted: isInserted,
+          },
+        };
+      }
+    },
+  );
 
-    if (req.data.venderName !== "GOOGLE") {
-      return;
-    }
-
-    if (req.method === "PUT" && req.path === "/editor/insert-text") {
-      console.log("gmail observer", req.data.text);
-
-      return {
-        statusCode: 400,
-        data: { prevText: "hello world" },
-      };
-    }
-  });
   gmailObserver.start();
 }
 
