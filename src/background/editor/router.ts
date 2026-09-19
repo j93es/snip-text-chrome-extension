@@ -1,14 +1,10 @@
 import type { MessageRequest, MessageResponse } from "../../core/message-types";
 import { service } from "./service";
 
-const contentRouter = async (
+const commonRouter = async (
   req: MessageRequest,
 ): Promise<MessageResponse | void> => {
-  if (!req.path.startsWith("/editor")) {
-    return;
-  }
-
-  if (req.src !== "CONTENT" || req.dst !== "BACKGROUND") {
+  if (req.dst !== "BACKGROUND") {
     return;
   }
 
@@ -27,13 +23,30 @@ const contentRouter = async (
       data: { msg: "ok" },
     };
   }
+
+  if (req.method === "GET" && req.path === "/editor/status") {
+    if (!req.data || !req.data.venderName) {
+      return {
+        statusCode: 400,
+        data: { msg: "Invaild data field" },
+      };
+    }
+
+    const result = await service.getEditorStatus(req.data.venderName);
+
+    if (result) {
+      return {
+        statusCode: 200,
+        data: result,
+      };
+    }
+  }
 };
 
 export const router = async (
-  req: MessageRequest,
+  data: MessageRequest,
 ): Promise<MessageResponse | void> => {
-  const res = await contentRouter(req);
-  if (res) {
-    return res;
-  }
+  const res = await commonRouter(data);
+
+  return res;
 };

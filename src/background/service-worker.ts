@@ -1,17 +1,13 @@
 import { listenMessage } from "../common/message-bus";
 import type { MessageRequest, MessageResponse } from "../core/message-types";
-import { router as editorContentRouter } from "./editor/content-router";
-import { router as popupContentRouter } from "./editor/popup-router";
+import { router as editorRouter } from "./editor/router";
 
 listenMessage(async (req: MessageRequest): Promise<MessageResponse> => {
-  const editorContentRouterRes = await editorContentRouter(req);
-  if (editorContentRouterRes) {
-    return editorContentRouterRes;
-  }
-
-  const popupContentRouterRes = await popupContentRouter(req);
-  if (popupContentRouterRes) {
-    return popupContentRouterRes;
+  if (req.path.startsWith("/editor/")) {
+    const editorRouterRes = await editorRouter(req);
+    if (editorRouterRes) {
+      return editorRouterRes;
+    }
   }
 
   return {

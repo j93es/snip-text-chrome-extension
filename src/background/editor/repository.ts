@@ -1,8 +1,8 @@
-import type { EditorStatus } from "../../core/editor-status";
+import type { EditorStatus } from "../../core/data-types";
 
 const storage: Record<string, EditorStatus> = {
-  NAVER: { isEditorRendered: false },
-  GOOGLE: { isEditorRendered: false },
+  NAVER: { isEditorRendered: false, text: "" },
+  GOOGLE: { isEditorRendered: false, text: "" },
 };
 
 const create = async (

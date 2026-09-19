@@ -2,9 +2,9 @@ export class UrlObserver {
   private currentUrl: string | undefined;
   private intervalId: number | null;
   private interval: number;
-  private urlChangedCallback: (url: string) => void;
+  private urlChangedCallback: (url: string) => Promise<void>;
 
-  constructor(changedCallback: (url: string) => void, interval = 100) {
+  constructor(changedCallback: (url: string) => Promise<void>, interval = 100) {
     this.currentUrl = undefined;
     this.intervalId = null;
     this.interval = interval;

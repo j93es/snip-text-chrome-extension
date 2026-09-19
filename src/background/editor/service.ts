@@ -1,5 +1,4 @@
-import type { EditorStatus } from "../../core/editor-status";
-import { sendMessage } from "../../common/message-bus";
+import type { EditorStatus } from "../../core/data-types";
 import { repository } from "./repository";
 
 const getEditorStatus = async (
@@ -13,14 +12,6 @@ const updateEditorStatus = async (
   status: EditorStatus,
 ): Promise<void> => {
   await repository.update(venderName, status);
-
-  await sendMessage({
-    src: "BACKGROUND",
-    dst: "POPUP",
-    method: "PUT",
-    path: "/editor/insert-text",
-    data: { venderName, status },
-  });
 };
 
 export const service = {

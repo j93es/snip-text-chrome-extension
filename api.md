@@ -1,5 +1,16 @@
 # API Documentation
 
+## scheme
+
+### EditorStatus
+
+```json
+{
+  "isEditorRendered": true | false,
+  "text": "{{ mail text }}"
+}
+```
+
 ## Common Error Response
 
 ```json
@@ -28,9 +39,11 @@
 {
   "src": "CONTENT",
   "dst": "BACKGROUND",
+  "path": "/editor/update-status",
+  "method": "PUT",
   "data": {
     "venderName": true | false,
-    "status": { "isEditorRendered": true | false }
+    "status": EditorStatus
   }
 }
 ```
@@ -51,9 +64,9 @@
 }
 ```
 
-### editor - from popup
+### editor
 
-#### GET - /editor/is-editor-rendered
+#### GET - /editor/status
 
 ##### Request
 
@@ -61,9 +74,9 @@
 {
   "src": "POPUP",
   "dst": "BACKGROUND",
-  "path": "/editor/insert-text",
-  "method": "PUT",
-  "data": { "venderName": "NAVER" | "GOOGLE" }
+  "path": "/editor/status",
+  "method": "GET",
+  "data": { "venderName": "{{ vender name }}" }
 }
 ```
 
@@ -72,7 +85,7 @@
 ```json
 {
   "statusCode": 200,
-  "data": { "isEditorRendered": true | false }
+  "data": EditorStatus
 }
 ```
 
@@ -85,7 +98,7 @@
 
 ## cotent
 
-### editor - from popup
+### editor
 
 #### PUT - /editor/insert-text
 
