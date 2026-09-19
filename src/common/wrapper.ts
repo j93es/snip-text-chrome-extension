@@ -1,16 +1,24 @@
-function tryCatch<T>(fn: () => T): T | undefined {
+import type { MessageResponse } from "../core/message-types";
+
+function tryCatch<T>(fn: () => T): T | MessageResponse {
   try {
     return fn();
   } catch (error) {
-    console.error("Error in tryCatch:", error);
-    return undefined;
+    return {
+      statusCode: 500,
+      data: { msg: JSON.stringify(error) },
+    };
   }
 }
 
-async function tryCatchAsync<T>(fn: () => Promise<T>): Promise<T | undefined> {
+async function tryCatchAsync<T>(
+  fn: () => Promise<T>,
+): Promise<T | MessageResponse> {
   return fn().catch((error) => {
-    console.error("Error in tryCatchAsync:", error);
-    return undefined;
+    return {
+      statusCode: 500,
+      data: { msg: JSON.stringify(error) },
+    };
   });
 }
 

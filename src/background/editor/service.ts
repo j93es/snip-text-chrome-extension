@@ -1,24 +1,11 @@
 import type { EditorStatus } from "../../core/editor-status";
-import { sendMessage, sendToActiveTab } from "../../common/message-bus";
-import type { MessageResponse } from "../../core/message-types";
+import { sendMessage } from "../../common/message-bus";
 import { repository } from "./repository";
 
 const getEditorStatus = async (
   venderName: string,
 ): Promise<EditorStatus | void> => {
   return (await repository.read(venderName)) ?? undefined;
-};
-
-const insertText = async (text: string): Promise<MessageResponse | void> => {
-  const res = await sendToActiveTab({
-    src: "BACKGROUND",
-    dst: "CONTENT",
-    method: "PUT",
-    path: "/editor/insert-text",
-    data: { text },
-  });
-
-  return res;
 };
 
 const updateEditorStatus = async (
@@ -38,6 +25,5 @@ const updateEditorStatus = async (
 
 export const service = {
   getEditorStatus,
-  insertText,
   updateEditorStatus,
 };

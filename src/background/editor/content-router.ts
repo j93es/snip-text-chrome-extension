@@ -12,25 +12,11 @@ const contentRouter = async (
     return;
   }
 
-  if (!req.data) {
-    return {
-      statusCode: 400,
-      data: { msg: "data field is empty." },
-    };
-  }
-
   if (req.method === "PUT" && req.path === "/editor/update-status") {
-    if (!req.data.venderName) {
+    if (!req.data || !req.data.venderName || !req.data.status) {
       return {
         statusCode: 400,
-        data: { msg: "venderName is empty." },
-      };
-    }
-
-    if (!req.data.status) {
-      return {
-        statusCode: 400,
-        data: { msg: "status is empty." },
+        data: { msg: "Invaild data field" },
       };
     }
 

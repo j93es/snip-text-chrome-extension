@@ -12,18 +12,11 @@ const popupRouter = async (
     return;
   }
 
-  if (!req.data) {
-    return {
-      statusCode: 400,
-      data: { msg: "data field is empty." },
-    };
-  }
-
   if (req.method === "GET" && req.path === "/editor/is-editor-rendered") {
-    if (!req.data.venderName) {
+    if (!req.data || !req.data.venderName) {
       return {
         statusCode: 400,
-        data: { msg: "venderName is empty." },
+        data: { msg: "Invaild data field" },
       };
     }
 
@@ -33,19 +26,6 @@ const popupRouter = async (
       statusCode: 200,
       data: { isEditorRendered: result },
     };
-  }
-
-  if (req.method === "PUT" && req.path === "/editor/insert-text") {
-    if (!req.data.text) {
-      return {
-        statusCode: 400,
-        data: { msg: "text is empty." },
-      };
-    }
-
-    const res = await service.insertText(req.data.text);
-
-    return res;
   }
 };
 

@@ -29,15 +29,19 @@ function startGmailObserver(): void {
   // background -> content
   listenMessage(
     async (req: MessageRequest): Promise<MessageResponse | void> => {
-      if (req.src !== "BACKGROUND" || req.dst !== "CONTENT" || !req.data.text) {
-        return {
-          statusCode: 400,
-          data: { msg: "Invalid field" },
-        };
+      if (req.src !== "POPUP" || req.dst !== "CONTENT") {
+        return;
       }
 
       // 경로별로 유효성 검사 분기
       if (req.method === "PUT" && req.path === "/editor/insert-text") {
+        if (!req.data || !req.data.text) {
+          return {
+            statusCode: 400,
+            data: { msg: "Invalid data field" },
+          };
+        }
+
         const editor = gmailObserver.getEditor();
         const { isInserted, prevText } = insertTextToEditor(
           editor,

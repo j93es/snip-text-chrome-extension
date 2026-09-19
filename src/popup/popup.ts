@@ -1,9 +1,9 @@
-import { sendMessage } from "../common/message-bus";
+import { sendToActiveTab } from "../common/message-bus";
 
 document?.getElementById("sendButton")?.addEventListener("click", async () => {
-  const response = await sendMessage({
+  const response = await sendToActiveTab({
     src: "POPUP",
-    dst: "BACKGROUND",
+    dst: "CONTENT",
     path: "/editor/insert-text",
     method: "PUT",
     data: { text: "hello" },

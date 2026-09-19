@@ -16,6 +16,6 @@ listenMessage(async (req: MessageRequest): Promise<MessageResponse> => {
 
   return {
     statusCode: 404,
-    data: { msg: "not founded" },
+    data: { msg: "router not founded" },
   };
 });
