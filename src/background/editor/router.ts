@@ -18,6 +18,11 @@ const commonRouter = async (
 
     await service.updateEditorStatus(req.data.venderName, req.data.status);
 
+    const res = await service.commandInsertTemplate(req.data.venderName);
+    if (res && res.statusCode !== 200) {
+      return res;
+    }
+
     return {
       statusCode: 200,
       data: { msg: "ok" },
@@ -40,6 +45,19 @@ const commonRouter = async (
         data: result,
       };
     }
+  }
+
+  if (req.method === "PUT" && req.path === "/editor/insert-text") {
+    if (!req.data || !req.data.text) {
+      return {
+        statusCode: 400,
+        data: { msg: "Invalid data field" },
+      };
+    }
+
+    const res = await service.insertText(req.data.text);
+
+    return res;
   }
 };
 

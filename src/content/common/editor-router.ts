@@ -1,7 +1,7 @@
 import { listenMessage } from "../../common/message-bus";
 import type { MessageRequest, MessageResponse } from "../../core/message-types";
 import { insertTextToEditor } from "./insert-text";
-import type { EditorVendorName } from "./editor-handler";
+import type { EditorVendorName } from "../../core/data-types";
 
 export interface EditorMessageRouterOptions {
   vendorName: EditorVendorName;
@@ -15,7 +15,7 @@ export function createEditorRouter({
   getEditorText,
 }: EditorMessageRouterOptions) {
   return async (req: MessageRequest): Promise<MessageResponse | void> => {
-    if (req.dst !== "CONTENT") {
+    if (req.src !== "BACKGROUND" || req.dst !== "CONTENT") {
       return;
     }
 

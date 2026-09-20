@@ -2,13 +2,17 @@
 
 ## scheme
 
-### EditorStatus
+### Type
 
-```json
-{
-  "isEditorRendered": true | false,
-  "text": "{{ mail text }}"
+```ts
+interface EditorStatus {
+  isEditorRendered: boolean;
+  text: string;
 }
+```
+
+```ts
+type EditorVendorName = "GOOGLE" | "NAVER";
 ```
 
 ## Common Error Response
@@ -42,7 +46,7 @@
   "path": "/editor/update-status",
   "method": "PUT",
   "data": {
-    "venderName": true | false,
+    "venderName": EditorVendorName,
     "status": EditorStatus
   }
 }

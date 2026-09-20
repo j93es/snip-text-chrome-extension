@@ -5,8 +5,8 @@ import type {
   EditorObserverFactory,
 } from "./observer/editor-observer";
 import { sendMessage } from "../../common/message-bus";
+import type { EditorVendorName } from "../../core/data-types";
 
-export type EditorVendorName = "GOOGLE" | "NAVER";
 export type EditorObserverType = "MUTATION" | "POLLING";
 
 export interface StartEditorObserverOptions {

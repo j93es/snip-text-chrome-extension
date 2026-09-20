@@ -1,15 +1,16 @@
 import type { EditorStatus } from "../../core/data-types";
+import type { EditorVendorName } from "../../core/data-types";
 
-const storage: Record<string, EditorStatus> = {
+const storage: Record<EditorVendorName, EditorStatus> = {
   NAVER: { isEditorRendered: false, text: "" },
   GOOGLE: { isEditorRendered: false, text: "" },
 };
 
 const create = async (
-  venderName: string,
+  venderName: EditorVendorName,
   data: EditorStatus,
 ): Promise<EditorStatus> => {
-  const key = venderName.toUpperCase();
+  const key = venderName;
   storage[key] = { ...storage[key], ...data };
 
   return storage[key];
@@ -23,16 +24,18 @@ const readLen = async (): Promise<number> => {
   return Object.keys(storage).length;
 };
 
-const read = async (venderName: string): Promise<EditorStatus | null> => {
-  const key = venderName.toUpperCase();
-  return storage[key] ? { ...storage[key] } : null;
+const read = async (venderName: EditorVendorName): Promise<EditorStatus> => {
+  const key = venderName;
+  return storage[key]
+    ? { ...storage[key] }
+    : { isEditorRendered: false, text: "" };
 };
 
 const update = async (
-  venderName: string,
+  venderName: EditorVendorName,
   data: Partial<EditorStatus>,
 ): Promise<EditorStatus | null> => {
-  const key = venderName.toUpperCase();
+  const key = venderName;
   if (!storage[key]) {
     return null;
   }
@@ -46,8 +49,10 @@ const update = async (
   return updated;
 };
 
-const deleteOne = async (venderName: string): Promise<EditorStatus | null> => {
-  const key = venderName.toUpperCase();
+const deleteOne = async (
+  venderName: EditorVendorName,
+): Promise<EditorStatus | null> => {
+  const key = venderName;
   if (!storage[key]) {
     return null;
   }
