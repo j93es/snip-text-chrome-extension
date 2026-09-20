@@ -1,19 +1,11 @@
 import type { EditorStatus, EditorVendorName } from "../../core/data-types";
-import type { MessageResponse } from "../../core/message-types";
 import { repository } from "./repository";
 import { sendToActiveTab } from "../../common/message-bus";
 
 const getEditorStatus = async (
-  venderName: EditorVendorName,
+  vendorName: EditorVendorName,
 ): Promise<EditorStatus | void> => {
-  return (await repository.read(venderName)) ?? undefined;
-};
-
-const updateEditorStatus = async (
-  venderName: EditorVendorName,
-  status: EditorStatus,
-): Promise<EditorStatus | void> => {
-  const res = await repository.update(venderName, status);
+  const res = await repository.read(vendorName);
   if (!res) {
     return;
   }
@@ -21,29 +13,60 @@ const updateEditorStatus = async (
   return res;
 };
 
-const insertText = async (text: string): Promise<MessageResponse | void> => {
-  const response = await sendToActiveTab({
+const updateEditorStatus = async (
+  vendorName: EditorVendorName,
+  status: Partial<EditorStatus>,
+): Promise<EditorStatus | void> => {
+  const res = await repository.update(vendorName, status);
+  if (!res) {
+    return;
+  }
+
+  return res;
+};
+
+const addPrevText = async (
+  vendorName: EditorVendorName,
+  prevText: string,
+): Promise<EditorStatus | void> => {
+  const res = await repository.appendPrevTexts(vendorName, prevText);
+  if (!res) {
+    return;
+  }
+
+  return res;
+};
+
+const insertText = async (text: string): Promise<EditorStatus | void> => {
+  const res = await sendToActiveTab({
     src: "BACKGROUND",
     dst: "CONTENT",
     path: "/editor/insert-text",
     method: "PUT",
     data: { text },
   });
+  if (!res) {
+    return;
+  }
+
+  const response = addPrevText(res.data.vendorName, res.data.prevText);
+  if (!response) {
+    return;
+  }
 
   return response;
 };
 
 // backend api에서 커멘드 목록 불러오기
 const command: Record<string, string> = {
-  "\\1": "template1",
-  "\\2": "template2",
-  "\\3": "template3",
+  "/1": "template1",
+  "/2": "template2",
+  "/3": "template3",
 };
 const commandInsertTemplate = async (
-  venderName: EditorVendorName,
-): Promise<MessageResponse | void> => {
-  const data = await repository.read(venderName);
-
+  vendorName: EditorVendorName,
+): Promise<EditorStatus | void> => {
+  const data = await repository.read(vendorName);
   if (!data) {
     return;
   }
@@ -55,18 +78,25 @@ const commandInsertTemplate = async (
       break;
     }
   }
-
   if (!matchedKey) {
     return;
   }
 
-  const response = await sendToActiveTab({
+  const res = await sendToActiveTab({
     src: "BACKGROUND",
     dst: "CONTENT",
     path: "/editor/insert-text",
     method: "PUT",
     data: { text: command[matchedKey] },
   });
+  if (!res) {
+    return;
+  }
+
+  const response = addPrevText(res.data.vendorName, res.data.prevText);
+  if (!response) {
+    return;
+  }
 
   return response;
 };
@@ -74,6 +104,7 @@ const commandInsertTemplate = async (
 export const service = {
   getEditorStatus,
   updateEditorStatus,
+  addPrevText,
   insertText,
   commandInsertTemplate,
 };

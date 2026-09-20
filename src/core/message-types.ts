@@ -13,7 +13,7 @@ export type StatusCode = 200 | 400 | 401 | 403 | 404 | 419 | 500;
 
 export interface MessageResponse {
   statusCode: StatusCode;
-  data: object;
+  data: any;
 }
 
 export interface MessageRequest {

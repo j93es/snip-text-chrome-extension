@@ -49,7 +49,7 @@ function startEditorObserver({
       path: "/editor/update-status",
       method: "PUT",
       data: {
-        venderName: vendorName,
+        vendorName: vendorName,
         status: { isEditorRendered, text },
       },
     });

@@ -27,7 +27,10 @@ function startNaverObserver(): void {
       dst: "BACKGROUND",
       path: "/editor/update-status",
       method: "PUT",
-      data: { venderName: "NAVER", status: { isEditorRendered, text: "" } },
+      data: {
+        vendorName: "NAVER",
+        status: { isEditorRendered, text: "", prevTexts: [] },
+      },
     });
   });
 
@@ -61,7 +64,7 @@ runAfterRender(() => {
   if (observer) {
     listenEditorRouter(
       createEditorRouter({
-        vendorName: "GOOGLE",
+        vendorName: "NAVER",
         getEditor: () => observer.getEditor(),
         getEditorText: (editor) => observer.getEditorText(editor),
       }),

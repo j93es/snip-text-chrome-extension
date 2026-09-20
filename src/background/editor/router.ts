@@ -8,36 +8,15 @@ const commonRouter = async (
     return;
   }
 
-  if (req.method === "PUT" && req.path === "/editor/update-status") {
-    if (!req.data || !req.data.venderName || !req.data.status) {
-      return {
-        statusCode: 400,
-        data: { msg: "Invaild data field" },
-      };
-    }
-
-    await service.updateEditorStatus(req.data.venderName, req.data.status);
-
-    const res = await service.commandInsertTemplate(req.data.venderName);
-    if (res && res.statusCode !== 200) {
-      return res;
-    }
-
-    return {
-      statusCode: 200,
-      data: { msg: "ok" },
-    };
-  }
-
   if (req.method === "GET" && req.path === "/editor/status") {
-    if (!req.data || !req.data.venderName) {
+    if (!req.data || !req.data.vendorName) {
       return {
         statusCode: 400,
         data: { msg: "Invaild data field" },
       };
     }
 
-    const result = await service.getEditorStatus(req.data.venderName);
+    const result = await service.getEditorStatus(req.data.vendorName);
 
     if (result) {
       return {
@@ -47,7 +26,33 @@ const commonRouter = async (
     }
   }
 
+  if (req.method === "PUT" && req.path === "/editor/update-status") {
+    if (req.src !== "CONTENT") {
+      return;
+    }
+
+    if (!req.data || !req.data.vendorName || !req.data.status) {
+      return {
+        statusCode: 400,
+        data: { msg: "Invaild data field" },
+      };
+    }
+
+    await service.updateEditorStatus(req.data.vendorName, req.data.status);
+
+    const result = await service.commandInsertTemplate(req.data.vendorName);
+
+    return {
+      statusCode: 200,
+      data: result,
+    };
+  }
+
   if (req.method === "PUT" && req.path === "/editor/insert-text") {
+    if (req.src !== "POPUP") {
+      return;
+    }
+
     if (!req.data || !req.data.text) {
       return {
         statusCode: 400,
@@ -55,9 +60,12 @@ const commonRouter = async (
       };
     }
 
-    const res = await service.insertText(req.data.text);
+    const result = await service.insertText(req.data.text);
 
-    return res;
+    return {
+      statusCode: 200,
+      data: result,
+    };
   }
 };
 

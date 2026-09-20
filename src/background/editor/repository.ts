@@ -1,19 +1,38 @@
 import type { EditorStatus } from "../../core/data-types";
 import type { EditorVendorName } from "../../core/data-types";
 
+const LIST_MAX_LEN = 2;
+
 const storage: Record<EditorVendorName, EditorStatus> = {
-  NAVER: { isEditorRendered: false, text: "" },
-  GOOGLE: { isEditorRendered: false, text: "" },
+  NAVER: {
+    isEditorRendered: false,
+    text: "",
+    prevTexts: [],
+    vendorName: "NAVER",
+  },
+  GOOGLE: {
+    isEditorRendered: false,
+    text: "",
+    prevTexts: [],
+    vendorName: "GOOGLE",
+  },
+};
+
+const read = async (
+  vendorName: EditorVendorName,
+): Promise<EditorStatus | null> => {
+  const key = vendorName;
+  return storage[key] ? { ...storage[key] } : null;
 };
 
 const create = async (
-  venderName: EditorVendorName,
+  vendorName: EditorVendorName,
   data: EditorStatus,
-): Promise<EditorStatus> => {
-  const key = venderName;
+): Promise<EditorStatus | null> => {
+  const key = vendorName;
   storage[key] = { ...storage[key], ...data };
 
-  return storage[key];
+  return await read(vendorName);
 };
 
 const readAll = async (): Promise<EditorStatus[]> => {
@@ -24,18 +43,11 @@ const readLen = async (): Promise<number> => {
   return Object.keys(storage).length;
 };
 
-const read = async (venderName: EditorVendorName): Promise<EditorStatus> => {
-  const key = venderName;
-  return storage[key]
-    ? { ...storage[key] }
-    : { isEditorRendered: false, text: "" };
-};
-
 const update = async (
-  venderName: EditorVendorName,
+  vendorName: EditorVendorName,
   data: Partial<EditorStatus>,
 ): Promise<EditorStatus | null> => {
-  const key = venderName;
+  const key = vendorName;
   if (!storage[key]) {
     return null;
   }
@@ -44,15 +56,31 @@ const update = async (
     ...storage[key],
     ...data,
   };
+  if (updated.prevTexts.length > LIST_MAX_LEN) {
+    updated.prevTexts.slice(LIST_MAX_LEN);
+  }
 
   storage[key] = updated;
-  return updated;
+
+  return await read(vendorName);
+};
+
+const appendPrevTexts = async (
+  vendorName: EditorVendorName,
+  prevText: string,
+): Promise<EditorStatus | null> => {
+  storage[vendorName].prevTexts.unshift(prevText);
+  if (storage[vendorName].prevTexts.length > LIST_MAX_LEN) {
+    storage[vendorName].prevTexts.pop();
+  }
+
+  return await read(vendorName);
 };
 
 const deleteOne = async (
-  venderName: EditorVendorName,
+  vendorName: EditorVendorName,
 ): Promise<EditorStatus | null> => {
-  const key = venderName;
+  const key = vendorName;
   if (!storage[key]) {
     return null;
   }
@@ -69,5 +97,6 @@ export const repository = {
   readLen,
   read,
   update,
+  appendPrevTexts,
   deleteOne,
 };

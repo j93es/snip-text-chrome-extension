@@ -46,7 +46,7 @@ type EditorVendorName = "GOOGLE" | "NAVER";
   "path": "/editor/update-status",
   "method": "PUT",
   "data": {
-    "venderName": EditorVendorName,
+    "vendrName": EditorVendorName,
     "status": EditorStatus
   }
 }
@@ -57,7 +57,7 @@ type EditorVendorName = "GOOGLE" | "NAVER";
 ```json
 {
   "statusCode": 200,
-  "data": { "msg": "ok" }
+  "data": EditorStatus
 }
 ```
 
@@ -80,7 +80,7 @@ type EditorVendorName = "GOOGLE" | "NAVER";
   "dst": "BACKGROUND",
   "path": "/editor/status",
   "method": "GET",
-  "data": { "venderName": "{{ vender name }}" }
+  "data": { "vendrName": "{{ vender name }}" }
 }
 ```
 
@@ -123,12 +123,7 @@ type EditorVendorName = "GOOGLE" | "NAVER";
 ```json
 {
   "statusCode": 200,
-  "data": {
-    "prevText": "{{ prev mail text }}",
-    "insertedText": "{{ mail template }}",
-    "currentText": "{{ mail template }}",
-    "isInserted": true | false
-  }
+  "data": EditorStatus
 }
 ```
 
@@ -142,6 +137,6 @@ type EditorVendorName = "GOOGLE" | "NAVER";
 ```json
 {
   "statusCode": 404,
-  "data": { "msg": "{{ venderName }} editor not found." }
+  "data": { "msg": "{{ vendrName }} editor not found." }
 }
 ```
