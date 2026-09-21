@@ -76,7 +76,7 @@ type EditorVendorName = "GOOGLE" | "NAVER";
 
 ```json
 {
-  "src": "POPUP",
+  "src": "POPUP" | "CONTENT",
   "dst": "BACKGROUND",
   "path": "/editor/status",
   "method": "GET",
@@ -100,6 +100,41 @@ type EditorVendorName = "GOOGLE" | "NAVER";
 }
 ```
 
+##### Request
+
+```json
+{
+  "src": "POPUP",
+  "dst": "BACKGROND",
+  "path": "/editor/insert-text",
+  "method": "PUT",
+  "data": { "text": "{{ mail template }}" }
+}
+```
+
+##### Response
+
+```json
+{
+  "statusCode": 200,
+  "data": EditorStatus
+}
+```
+
+```json
+{
+  "statusCode": 400,
+  "data": { "msg": "Invalid data field" }
+}
+```
+
+```json
+{
+  "statusCode": 404,
+  "data": { "msg": "{{ vendrName }} editor not found." }
+}
+```
+
 ## cotent
 
 ### editor
@@ -110,8 +145,8 @@ type EditorVendorName = "GOOGLE" | "NAVER";
 
 ```json
 {
-  "src": "POPUP",
-  "dst": "BACKGROUND",
+  "src": "BACKGROND",
+  "dst": "CONTENT",
   "path": "/editor/insert-text",
   "method": "PUT",
   "data": { "text": "{{ mail template }}" }

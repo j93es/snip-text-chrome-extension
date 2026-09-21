@@ -1,6 +1,6 @@
 import type { EditorStatus, EditorVendorName } from "../../core/data-types";
 import { repository } from "./repository";
-import { sendToActiveTab } from "../../common/message-bus";
+import { sendToActiveTab, sendMessage } from "../../common/message-bus";
 
 const getEditorStatus = async (
   vendorName: EditorVendorName,
@@ -33,6 +33,15 @@ const addPrevText = async (
   if (!res) {
     return;
   }
+
+  // TODO: prevText listner에게 상테 전송
+  sendMessage({
+    src: "BACKGROUND",
+    dst: "POPUP",
+    method: "PUT",
+    path: "/editor/notify-status",
+    data: res,
+  });
 
   return res;
 };

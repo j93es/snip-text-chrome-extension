@@ -1,7 +1,7 @@
 import type { MessageRequest, MessageResponse } from "../../core/message-types";
 import { service } from "./service";
 
-const commonRouter = async (
+const routing = async (
   req: MessageRequest,
 ): Promise<MessageResponse | void> => {
   if (req.dst !== "BACKGROUND") {
@@ -72,7 +72,7 @@ const commonRouter = async (
 export const router = async (
   data: MessageRequest,
 ): Promise<MessageResponse | void> => {
-  const res = await commonRouter(data);
+  const res = await routing(data);
 
   return res;
 };
