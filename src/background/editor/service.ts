@@ -34,7 +34,6 @@ const addPrevText = async (
     return;
   }
 
-  // TODO: prevText listner에게 상테 전송
   sendMessage({
     src: "BACKGROUND",
     dst: "POPUP",
@@ -102,12 +101,7 @@ const commandInsertTemplate = async (
     return;
   }
 
-  const response = addPrevText(res.data.vendorName, res.data.prevText);
-  if (!response) {
-    return;
-  }
-
-  return response;
+  return await getEditorStatus(res.data.vendorName);
 };
 
 export const service = {

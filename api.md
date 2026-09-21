@@ -175,3 +175,37 @@ type EditorVendorName = "GOOGLE" | "NAVER";
   "data": { "msg": "{{ vendrName }} editor not found." }
 }
 ```
+
+## popup
+
+### editor
+
+#### PUT - /editor/notify-status
+
+##### Request
+
+```json
+{
+  "src": "BACKGROND",
+  "dst": "POPUP",
+  "path": "/editor/notify-status",
+  "method": "PUT",
+  "data": EditorStatus
+}
+```
+
+##### Response
+
+```json
+{
+  "statusCode": 200,
+  "data": EditorStatus
+}
+```
+
+```json
+{
+  "statusCode": 400,
+  "data": { "msg": "Invalid data field" }
+}
+```
