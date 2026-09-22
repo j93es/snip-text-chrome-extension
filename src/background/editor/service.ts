@@ -57,6 +57,8 @@ const insertText = async (text: string): Promise<EditorStatus | void> => {
     return;
   }
 
+  await repository.update(res.data.vendorName, { text });
+
   const response = addPrevText(res.data.vendorName, res.data.prevText);
   if (!response) {
     return;

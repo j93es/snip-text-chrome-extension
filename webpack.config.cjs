@@ -8,7 +8,7 @@ module.exports = {
     "src/background/service-worker": "./src/background/service-worker.ts",
     "src/content/gmail": "./src/content/gmail.ts",
     "src/content/naver": "./src/content/naver.ts",
-    "src/popup/index": "./src/popup/popup.ts",
+    // "src/popup/index": "./src/popup/src/index.html",
   },
   output: {
     path: path.resolve(__dirname, "dist"),

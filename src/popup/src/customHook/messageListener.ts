@@ -1,0 +1,63 @@
+import { useEffect } from "react";
+import { tryCatch } from "../common/wrapper";
+import type { MessageRequest, MessageResponse } from "../core/message-types";
+
+const EDITOR_NOTIFY_STATUS_PATH = "/editor/notify-status";
+
+function useMessageListener(
+  callback: (
+    req: MessageRequest,
+  ) => Promise<MessageResponse | void> | MessageResponse | void,
+): void {
+  useEffect(() => {
+    const _callback = (
+      req: MessageRequest,
+      _sender: chrome.runtime.MessageSender,
+      sendResponse: (response: MessageResponse) => void,
+    ) => {
+      Promise.resolve(callback(req)).then((res) => {
+        if (res) {
+          sendResponse(res);
+          return;
+        }
+
+        sendResponse({
+          statusCode: 500,
+          data: { msg: `${req.path} | response data is not created` },
+        });
+      });
+
+      return true;
+    };
+
+    tryCatch(() => {
+      chrome.runtime.onMessage.addListener(_callback);
+    });
+
+    return () => {
+      tryCatch(() => {
+        chrome.runtime.onMessage.removeListener(_callback);
+      });
+    };
+  }, [callback]);
+}
+
+function useStatusNotifyListener(
+  callback: (
+    req: MessageRequest,
+  ) => Promise<MessageResponse | void> | MessageResponse | void,
+): void {
+  useMessageListener((req) => {
+    if (req.path !== EDITOR_NOTIFY_STATUS_PATH) {
+      return;
+    }
+
+    return callback(req);
+  });
+}
+
+export {
+  useMessageListener,
+  useStatusNotifyListener,
+  EDITOR_NOTIFY_STATUS_PATH,
+};

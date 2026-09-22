@@ -9,7 +9,7 @@ export function insertTextToEditor(
     };
   }
 
-  const prevText = editor.textContent === "," ? "" : editor.textContent ?? "";
+  const prevText = editor.textContent === "," ? "" : (editor.textContent ?? "");
   const safeText = String(text ?? "");
 
   if (!safeText) {
@@ -33,10 +33,26 @@ export function insertTextToEditor(
       selection.addRange(range);
     }
 
-    const textNode = document.createTextNode(safeText);
-    range.insertNode(textNode);
-    range.setStartAfter(textNode);
-    range.setEndAfter(textNode);
+    const normalizedText = safeText.replace(/\r\n/g, "\n");
+    const lines = normalizedText.split("\n");
+
+    lines.forEach((line, index) => {
+      if (index > 0) {
+        const lineBreak = document.createElement("br");
+        range.insertNode(lineBreak);
+        range.setStartAfter(lineBreak);
+        range.setEndAfter(lineBreak);
+      }
+
+      if (!line) {
+        return;
+      }
+
+      const textNode = document.createTextNode(line);
+      range.insertNode(textNode);
+      range.setStartAfter(textNode);
+      range.setEndAfter(textNode);
+    });
 
     if (selection) {
       selection.removeAllRanges();

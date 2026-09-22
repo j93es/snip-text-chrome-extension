@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && webpack --config webpack.config.cjs",
+    "build": "tsc && webpack --config webpack.config.cjs && npm run build:popup",
+    "build:popup": "npm --prefix src/popup run build && mkdir -p dist/src/popup && cp -R src/popup/dist/. dist/src/popup/",
     "preview": "vite preview"
   },
   "devDependencies": {
