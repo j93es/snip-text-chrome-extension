@@ -1,4 +1,5 @@
 import { EditorMutationObserver } from "./observer/editor-mutation-observer";
+import { EditorCombinedObserver } from "./observer/editor-combined-observer";
 import { EditorPollingObserver } from "./observer/editor-polling-observer";
 import type {
   EditorObserver,
@@ -7,7 +8,7 @@ import type {
 import { sendMessage } from "../../common/message-bus";
 import type { EditorVendorName } from "../../core/data-types";
 
-export type EditorObserverType = "MUTATION" | "POLLING";
+export type EditorObserverType = "MUTATION" | "POLLING" | "COMBINED";
 
 export interface StartEditorObserverOptions {
   vendorName: EditorVendorName;
@@ -25,13 +26,17 @@ function createEditorObserver(
     return new EditorPollingObserver(selector, changedCallback);
   }
 
-  return new EditorMutationObserver(selector, changedCallback);
+  if (observerType === "MUTATION") {
+    return new EditorMutationObserver(selector, changedCallback);
+  }
+
+  return new EditorCombinedObserver(selector, changedCallback);
 }
 
 function startEditorObserver({
   vendorName,
   selector,
-  observerType = "MUTATION",
+  observerType = "COMBINED",
   shouldInitialize = () => true,
 }: StartEditorObserverOptions): EditorObserver | null {
   if (!shouldInitialize()) {

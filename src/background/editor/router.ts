@@ -1,4 +1,5 @@
 import type { MessageRequest, MessageResponse } from "../../core/message-types";
+import { sendToActiveTab, sendMessage } from "../../common/message-bus";
 import { service } from "./service";
 
 const routing = async (
@@ -42,6 +43,14 @@ const routing = async (
 
     const result = await service.commandInsertTemplate(req.data.vendorName);
 
+    sendMessage({
+      src: "BACKGROUND",
+      dst: "POPUP",
+      method: "PUT",
+      path: "/editor/notify-status",
+      data: result,
+    });
+
     return {
       statusCode: 200,
       data: result,
@@ -60,7 +69,31 @@ const routing = async (
       };
     }
 
-    const result = await service.insertText(req.data.text);
+    const res = await sendToActiveTab({
+      src: "BACKGROUND",
+      dst: "CONTENT",
+      path: "/editor/insert-text",
+      method: "PUT",
+      data: { text: req.data.text },
+    });
+
+    if (!res) {
+      return;
+    }
+
+    const result = await service.insertText(
+      res.data.vendorName,
+      res.data.text,
+      res.data.prevText,
+    );
+
+    sendMessage({
+      src: "BACKGROUND",
+      dst: "POPUP",
+      method: "PUT",
+      path: "/editor/notify-status",
+      data: result,
+    });
 
     return {
       statusCode: 200,

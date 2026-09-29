@@ -44,7 +44,7 @@ export function createEditorRouter({
         statusCode: 200,
         data: {
           prevText,
-          currentText: getEditorText(getEditor()),
+          text: getEditorText(getEditor()),
           isInserted,
           vendorName,
         },

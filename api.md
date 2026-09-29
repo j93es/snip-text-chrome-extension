@@ -8,6 +8,8 @@
 interface EditorStatus {
   isEditorRendered: boolean;
   text: string;
+  prevTexts: string[];
+  vendorName: EditorVendorName;
 }
 ```
 

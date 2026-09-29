@@ -3,7 +3,7 @@ import { useStatusNotifyListener } from "../customHook/messageListener";
 import { sendMessage } from "../common/sendMessage";
 import type { MessageRequest } from "../core/message-types";
 
-function TestMessage() {
+function TestMessage({ vendorName }: { vendorName: string }) {
   const [responseData, setResponseData] = useState<unknown>(null);
 
   useStatusNotifyListener(async (req: MessageRequest) => {
@@ -11,35 +11,38 @@ function TestMessage() {
       return;
     }
 
-    setResponseData(req.data ?? { msg: "Invalid data field" });
+    if (req?.data.vendorName === vendorName) {
+      setResponseData(req.data ?? { msg: "No response" });
+    }
   });
 
   const handleGetStatusClick = async () => {
-    const response = await sendMessage({
+    const res = await sendMessage({
       src: "POPUP",
       dst: "BACKGROUND",
       path: "/editor/status",
       method: "GET",
-      data: { vendorName: "GOOGLE" },
+      data: { vendorName },
     });
 
-    setResponseData(response ?? { msg: "No response" });
+    if (res?.data.vendorName === vendorName) {
+      setResponseData(res.data ?? { msg: "No response" });
+    }
   };
 
   const handleInsertTextClick = async () => {
-    const response = await sendMessage({
+    sendMessage({
       src: "POPUP",
       dst: "BACKGROUND",
       path: "/editor/insert-text",
       method: "PUT",
       data: { text: "hello" },
     });
-
-    setResponseData(response ?? { msg: "No response" });
   };
 
   return (
     <div>
+      <text>{vendorName}</text>
       <button onClick={handleGetStatusClick}>Get Status</button>
       <button onClick={handleInsertTextClick}>Insert Text</button>
       <pre>{JSON.stringify(responseData, null, 2)}</pre>

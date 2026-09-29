@@ -41,7 +41,7 @@ function startNaverEditorObserver(): EditorObserver | null {
   return startEditorObserver({
     vendorName: "NAVER",
     selector: NAVER_EDITOR_SELECTOR,
-    observerType: "MUTATION",
+    observerType: "COMBINED",
     shouldInitialize: () => {
       if (window.self === window.top) {
         return false;

@@ -12,7 +12,7 @@ function startGmailEditorObserver(): EditorObserver | null {
   return startEditorObserver({
     vendorName: "GOOGLE",
     selector: GMAIL_EDITOR_SELECTOR,
-    observerType: "POLLING",
+    observerType: "COMBINED",
     shouldInitialize: () => true,
   });
 }

@@ -1,6 +1,6 @@
 import type { EditorStatus, EditorVendorName } from "../../core/data-types";
 import { repository } from "./repository";
-import { sendToActiveTab, sendMessage } from "../../common/message-bus";
+import { sendToActiveTab } from "../../common/message-bus";
 
 const getEditorStatus = async (
   vendorName: EditorVendorName,
@@ -29,37 +29,28 @@ const addPrevText = async (
   vendorName: EditorVendorName,
   prevText: string,
 ): Promise<EditorStatus | void> => {
+  if (prevText === "") {
+    return;
+  }
+
   const res = await repository.appendPrevTexts(vendorName, prevText);
   if (!res) {
     return;
   }
 
-  sendMessage({
-    src: "BACKGROUND",
-    dst: "POPUP",
-    method: "PUT",
-    path: "/editor/notify-status",
-    data: res,
-  });
-
   return res;
 };
 
-const insertText = async (text: string): Promise<EditorStatus | void> => {
-  const res = await sendToActiveTab({
-    src: "BACKGROUND",
-    dst: "CONTENT",
-    path: "/editor/insert-text",
-    method: "PUT",
-    data: { text },
-  });
-  if (!res) {
-    return;
+const insertText = async (
+  vendorName: EditorVendorName,
+  text: string,
+  prevText: string,
+): Promise<EditorStatus | void> => {
+  if (prevText.length > 0) {
+    await addPrevText(vendorName, prevText);
   }
 
-  await repository.update(res.data.vendorName, { text });
-
-  const response = addPrevText(res.data.vendorName, res.data.prevText);
+  const response = await repository.update(vendorName, { text });
   if (!response) {
     return;
   }

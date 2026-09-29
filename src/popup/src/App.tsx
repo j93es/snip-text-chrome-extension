@@ -5,7 +5,8 @@ import TestSmartTemplate from "./component/TestSmartTemplate";
 function App() {
   return (
     <div>
-      <TestMessage />
+      <TestMessage vendorName="GOOGLE" />
+      <TestMessage vendorName="NAVER" />
       <TestSmartTemplate />
     </div>
   );
