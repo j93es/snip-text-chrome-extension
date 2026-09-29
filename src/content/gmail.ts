@@ -25,7 +25,7 @@ runAfterRender(() => {
       createEditorRouter({
         vendorName: "GOOGLE",
         getEditor: () => observer.getEditor(),
-        getEditorText: (editor) => observer.getEditorText(editor),
+        getEditorStatus: () => observer.getEditorStatus(),
       }),
     );
   }

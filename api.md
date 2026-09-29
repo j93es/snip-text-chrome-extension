@@ -5,16 +5,16 @@
 ### Type
 
 ```ts
+type EditorVendorName = "GOOGLE" | "NAVER";
+```
+
+```ts
 interface EditorStatus {
-  isEditorRendered: boolean;
+  isEditable: boolean;
   text: string;
   prevTexts: string[];
   vendorName: EditorVendorName;
 }
-```
-
-```ts
-type EditorVendorName = "GOOGLE" | "NAVER";
 ```
 
 ## Common Error Response

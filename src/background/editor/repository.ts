@@ -5,13 +5,13 @@ const LIST_MAX_LEN = 2;
 
 const storage: Record<EditorVendorName, EditorStatus> = {
   NAVER: {
-    isEditorRendered: false,
+    isEditable: false,
     text: "",
     prevTexts: [],
     vendorName: "NAVER",
   },
   GOOGLE: {
-    isEditorRendered: false,
+    isEditable: false,
     text: "",
     prevTexts: [],
     vendorName: "GOOGLE",

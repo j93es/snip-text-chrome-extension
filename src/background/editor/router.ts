@@ -18,7 +18,6 @@ const routing = async (
     }
 
     const result = await service.getEditorStatus(req.data.vendorName);
-
     if (result) {
       return {
         statusCode: 200,
@@ -42,14 +41,15 @@ const routing = async (
     await service.updateEditorStatus(req.data.vendorName, req.data.status);
 
     const result = await service.commandInsertTemplate(req.data.vendorName);
-
-    sendMessage({
-      src: "BACKGROUND",
-      dst: "POPUP",
-      method: "PUT",
-      path: "/editor/notify-status",
-      data: result,
-    });
+    if (result) {
+      sendMessage({
+        src: "BACKGROUND",
+        dst: "POPUP",
+        method: "PUT",
+        path: "/editor/notify-status",
+        data: result,
+      });
+    }
 
     return {
       statusCode: 200,

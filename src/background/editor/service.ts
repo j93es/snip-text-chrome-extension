@@ -46,7 +46,7 @@ const insertText = async (
   text: string,
   prevText: string,
 ): Promise<EditorStatus | void> => {
-  if (prevText.length > 0) {
+  if (prevText && prevText.length > 0) {
     await addPrevText(vendorName, prevText);
   }
 

@@ -1,6 +1,6 @@
 import { EditorMutationObserver } from "./observer/editor-mutation-observer";
-import { EditorCombinedObserver } from "./observer/editor-combined-observer";
 import { EditorPollingObserver } from "./observer/editor-polling-observer";
+import { EditorCombinedObserver } from "./observer/editor-combined-observer";
 import type {
   EditorObserver,
   EditorObserverFactory,
@@ -44,9 +44,9 @@ function startEditorObserver({
   }
 
   const observer = createEditorObserver(selector, observerType, async () => {
-    const editor = observer.getEditor();
-    const isEditorRendered = editor !== null;
-    const text = observer.getEditorText(editor);
+    const status = observer.getEditorStatus();
+    const isEditable = status?.isEditable ?? false;
+    const text = status?.text ?? "";
 
     await sendMessage({
       src: "CONTENT",
@@ -55,7 +55,7 @@ function startEditorObserver({
       method: "PUT",
       data: {
         vendorName: vendorName,
-        status: { isEditorRendered, text },
+        status: { isEditable, text },
       },
     });
   });

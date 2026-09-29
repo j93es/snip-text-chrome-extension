@@ -4,6 +4,7 @@ export class EditorPollingObserver implements EditorObserver {
   private selector: string;
   private currentEditor: HTMLElement | null | undefined;
   private currentText: string;
+  private isEditable: boolean;
   private intervalId: number | null = null;
   private editorChangedCallback: () => Promise<void>;
 
@@ -11,6 +12,7 @@ export class EditorPollingObserver implements EditorObserver {
     this.selector = selector;
     this.currentEditor = undefined;
     this.currentText = "";
+    this.isEditable = false;
     this.editorChangedCallback = changedCallback;
   }
 
@@ -35,20 +37,24 @@ export class EditorPollingObserver implements EditorObserver {
     this.currentText = "";
   }
 
-  getEditorText(editor: HTMLElement | null | undefined): string {
-    if (!(editor instanceof HTMLElement)) {
-      return "";
-    }
-
-    return editor.textContent?.replace(/\u200B/g, "") ?? "";
+  getEditorStatus() {
+    return {
+      isEditable: this.isEditable,
+      text: this.currentEditor?.textContent?.replace(/\u200B/g, "") ?? "",
+    };
   }
 
   checkEditor() {
     const editors = document.querySelectorAll<HTMLElement>(this.selector);
-
     const editor =
       [...editors].find((editor) => editor.offsetParent !== null) ?? null;
-    const nextText = this.getEditorText(editor);
+    if (editor) {
+      this.isEditable = true;
+    } else {
+      this.isEditable = false;
+    }
+
+    const nextText = this.getEditorStatus()?.text ?? "";
     const textChanged =
       editor !== null &&
       editor === this.currentEditor &&

@@ -21,18 +21,18 @@ function startNaverObserver(): void {
   }
 
   const naverObserver = new UrlObserver(async () => {
-    const isEditorRendered = naverObserver.getUrl()?.includes(NAVER_EDITOR_URL);
-    sendMessage({
+    const isEditable = naverObserver.getUrl()?.includes(NAVER_EDITOR_URL);
+    await sendMessage({
       src: "CONTENT",
       dst: "BACKGROUND",
       path: "/editor/update-status",
       method: "PUT",
       data: {
         vendorName: "NAVER",
-        status: { isEditorRendered, text: "", prevTexts: [] },
+        status: { isEditable },
       },
     });
-  });
+  }, 100);
 
   naverObserver.start();
 }
@@ -66,7 +66,7 @@ runAfterRender(() => {
       createEditorRouter({
         vendorName: "NAVER",
         getEditor: () => observer.getEditor(),
-        getEditorText: (editor) => observer.getEditorText(editor),
+        getEditorStatus: () => observer.getEditorStatus(),
       }),
     );
   }

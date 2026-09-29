@@ -5,6 +5,9 @@ import type { MessageRequest } from "../core/message-types";
 
 function TestMessage({ vendorName }: { vendorName: string }) {
   const [responseData, setResponseData] = useState<unknown>(null);
+  if (!vendorName) {
+    return <></>;
+  }
 
   useStatusNotifyListener(async (req: MessageRequest) => {
     if (req.src !== "BACKGROUND" || req.dst !== "POPUP") {

@@ -1,5 +1,5 @@
 export interface EditorStatus {
-  isEditorRendered: boolean;
+  isEditable: boolean;
   text: string;
   prevTexts: string[];
   vendorName: EditorVendorName;

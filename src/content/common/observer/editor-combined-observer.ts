@@ -4,7 +4,7 @@ export class EditorCombinedObserver implements EditorObserver {
   private selector: string;
   private currentEditor: HTMLElement | null | undefined;
   private currentText: string;
-
+  private isEditable: boolean;
   private observer: MutationObserver;
   private editorChangedCallback: () => Promise<void>;
 
@@ -17,8 +17,8 @@ export class EditorCombinedObserver implements EditorObserver {
     this.selector = selector;
     this.currentEditor = undefined;
     this.currentText = "";
+    this.isEditable = false;
     this.editorChangedCallback = changedCallback;
-
     this.observer = new MutationObserver(this.handleMutations);
   }
 
@@ -41,18 +41,16 @@ export class EditorCombinedObserver implements EditorObserver {
     document.removeEventListener("input", this.handleInput);
 
     this.observer.disconnect();
-
     this.currentEditor = undefined;
     this.currentText = "";
     this.callbackScheduled = false;
   }
 
-  getEditorText(editor: HTMLElement | null | undefined): string {
-    if (!(editor instanceof HTMLElement)) {
-      return "";
-    }
-
-    return editor.textContent?.replace(/\u200B/g, "") ?? "";
+  getEditorStatus() {
+    return {
+      isEditable: this.isEditable,
+      text: this.currentEditor?.textContent?.replace(/\u200B/g, "") ?? "",
+    };
   }
 
   getEditor() {
@@ -63,12 +61,20 @@ export class EditorCombinedObserver implements EditorObserver {
    * 현재 활성화된 editor를 확인한다.
    */
   checkEditor() {
-    const editor = this.findActiveEditor();
+    const editor =
+      this.findActiveEditor() ||
+      ([...document.querySelectorAll<HTMLElement>(this.selector)].find(
+        (editor) => editor.offsetParent !== null,
+      ) ??
+        null);
+    if (editor) {
+      this.isEditable = true;
+    } else {
+      this.isEditable = false;
+    }
 
-    const nextText = this.getEditorText(editor);
-
+    const nextText = this.getEditorStatus()?.text ?? "";
     const editorChanged = editor !== this.currentEditor;
-
     const textChanged =
       editor !== null &&
       editor === this.currentEditor &&
@@ -164,7 +170,7 @@ export class EditorCombinedObserver implements EditorObserver {
      * input 이벤트에서는 해당 editor가 확실하므로
      * 불필요하게 DOM 전체를 탐색하지 않는다.
      */
-    const nextText = this.getEditorText(editor);
+    const nextText = this.getEditorStatus()?.text ?? "";
 
     if (editor === this.currentEditor && nextText === this.currentText) {
       return;

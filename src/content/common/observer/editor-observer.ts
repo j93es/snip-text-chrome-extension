@@ -1,8 +1,10 @@
+import type { EditorStatus } from "../../../core/data-types";
+
 export interface EditorObserver {
   start(): void;
   stop(): void;
   getEditor(): HTMLElement | null | undefined;
-  getEditorText(editor: HTMLElement | null | undefined): string;
+  getEditorStatus(): Partial<EditorStatus> | null;
   checkEditor(): void;
 }
 
