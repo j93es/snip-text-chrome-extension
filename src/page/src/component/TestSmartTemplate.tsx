@@ -57,7 +57,7 @@ function TestSmartTemplate() {
     setRenderedText(nextText);
 
     const response = await sendMessage({
-      src: "POPUP",
+      src: "PAGE",
       dst: "BACKGROUND",
       path: "/editor/insert-text",
       method: "PUT",

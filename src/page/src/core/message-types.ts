@@ -1,4 +1,4 @@
-export type MessageSource = "CONTENT" | "BACKGROUND" | "POPUP";
+export type MessageSource = "CONTENT" | "BACKGROUND" | "PAGE";
 export type MessageMethod =
   | "GET"
   | "POST"

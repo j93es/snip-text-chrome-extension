@@ -48,6 +48,10 @@ function useStatusNotifyListener(
   ) => Promise<MessageResponse | void> | MessageResponse | void,
 ): void {
   useMessageListener((req) => {
+    if (req.src !== "BACKGROUND" || req.dst !== "PAGE") {
+      return;
+    }
+
     if (req.path !== EDITOR_NOTIFY_STATUS_PATH) {
       return;
     }

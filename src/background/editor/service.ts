@@ -41,7 +41,7 @@ const addPrevText = async (
   return res;
 };
 
-const insertText = async (
+const updateText = async (
   vendorName: EditorVendorName,
   text: string,
   prevText: string,
@@ -80,8 +80,10 @@ const commandInsertTemplate = async (
     }
   }
   if (!matchedKey) {
-    return;
+    return await getEditorStatus(vendorName);
   }
+
+  await updateText(vendorName, command[matchedKey], "");
 
   const res = await sendToActiveTab({
     src: "BACKGROUND",
@@ -94,13 +96,13 @@ const commandInsertTemplate = async (
     return;
   }
 
-  return await getEditorStatus(res.data.vendorName);
+  return await getEditorStatus(vendorName);
 };
 
 export const service = {
   getEditorStatus,
   updateEditorStatus,
   addPrevText,
-  insertText,
+  updateText,
   commandInsertTemplate,
 };

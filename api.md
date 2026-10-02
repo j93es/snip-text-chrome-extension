@@ -78,7 +78,7 @@ interface EditorStatus {
 
 ```json
 {
-  "src": "POPUP" | "CONTENT",
+  "src": "PAGE" | "CONTENT",
   "dst": "BACKGROUND",
   "path": "/editor/status",
   "method": "GET",
@@ -106,7 +106,7 @@ interface EditorStatus {
 
 ```json
 {
-  "src": "POPUP",
+  "src": "PAGE",
   "dst": "BACKGROND",
   "path": "/editor/insert-text",
   "method": "PUT",
@@ -178,7 +178,7 @@ interface EditorStatus {
 }
 ```
 
-## popup
+## PAGE
 
 ### editor
 
@@ -189,7 +189,7 @@ interface EditorStatus {
 ```json
 {
   "src": "BACKGROND",
-  "dst": "POPUP",
+  "dst": "PAGE",
   "path": "/editor/notify-status",
   "method": "PUT",
   "data": EditorStatus

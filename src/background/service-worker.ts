@@ -15,3 +15,9 @@ listenMessage(async (req: MessageRequest): Promise<MessageResponse> => {
     data: { msg: "router not founded" },
   };
 });
+
+chrome.action.onClicked.addListener(async (tab) => {
+  if (tab.id) {
+    await chrome.sidePanel.open({ tabId: tab.id });
+  }
+});

@@ -39,12 +39,11 @@ const routing = async (
     }
 
     await service.updateEditorStatus(req.data.vendorName, req.data.status);
-
     const result = await service.commandInsertTemplate(req.data.vendorName);
     if (result) {
-      sendMessage({
+      await sendMessage({
         src: "BACKGROUND",
-        dst: "POPUP",
+        dst: "PAGE",
         method: "PUT",
         path: "/editor/notify-status",
         data: result,
@@ -58,7 +57,7 @@ const routing = async (
   }
 
   if (req.method === "PUT" && req.path === "/editor/insert-text") {
-    if (req.src !== "POPUP") {
+    if (req.src !== "PAGE") {
       return;
     }
 
@@ -76,20 +75,19 @@ const routing = async (
       method: "PUT",
       data: { text: req.data.text },
     });
-
     if (!res) {
       return;
     }
 
-    const result = await service.insertText(
+    const result = await service.updateText(
       res.data.vendorName,
       res.data.text,
       res.data.prevText,
     );
 
-    sendMessage({
+    await sendMessage({
       src: "BACKGROUND",
-      dst: "POPUP",
+      dst: "PAGE",
       method: "PUT",
       path: "/editor/notify-status",
       data: result,

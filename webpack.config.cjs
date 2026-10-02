@@ -8,7 +8,6 @@ module.exports = {
     "src/background/service-worker": "./src/background/service-worker.ts",
     "src/content/gmail": "./src/content/gmail.ts",
     "src/content/naver": "./src/content/naver.ts",
-    // "src/popup/index": "./src/popup/src/index.html",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -39,9 +38,9 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "./src/popup/index.html",
-      filename: "src/popup/index.html",
-      chunks: ["src/popup/index"],
+      template: "./src/page/index.html",
+      filename: "src/page/index.html",
+      chunks: ["src/page/index"],
       inject: "body",
     }),
     new CopyWebpackPlugin({

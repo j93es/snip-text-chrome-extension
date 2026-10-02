@@ -10,10 +10,6 @@ function TestMessage({ vendorName }: { vendorName: string }) {
   }
 
   useStatusNotifyListener(async (req: MessageRequest) => {
-    if (req.src !== "BACKGROUND" || req.dst !== "POPUP") {
-      return;
-    }
-
     if (req?.data.vendorName === vendorName) {
       setResponseData(req.data ?? { msg: "No response" });
     }
@@ -21,7 +17,7 @@ function TestMessage({ vendorName }: { vendorName: string }) {
 
   const handleGetStatusClick = async () => {
     const res = await sendMessage({
-      src: "POPUP",
+      src: "PAGE",
       dst: "BACKGROUND",
       path: "/editor/status",
       method: "GET",
@@ -34,8 +30,8 @@ function TestMessage({ vendorName }: { vendorName: string }) {
   };
 
   const handleInsertTextClick = async () => {
-    sendMessage({
-      src: "POPUP",
+    await sendMessage({
+      src: "PAGE",
       dst: "BACKGROUND",
       path: "/editor/insert-text",
       method: "PUT",

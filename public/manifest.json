@@ -2,6 +2,14 @@
   "manifest_version": 3,
   "name": "Snip Text",
   "version": "1.0",
+  "permissions": [
+    "sidePanel",
+    "activeTab",
+    "background",
+    "clipboardWrite",
+    "scripting",
+    "storage"
+  ],
   "background": {
     "service_worker": "./src/background/service-worker.js"
   },
@@ -9,17 +17,22 @@
     {
       "matches": ["https://mail.google.com/*"],
       "js": ["./src/content/gmail.js"],
-      "type": "module"
+      "type": "module",
+      "run_at": "document_idle"
     },
     {
       "matches": ["https://mail.naver.com/*"],
       "js": ["./src/content/naver.js"],
       "type": "module",
       "all_frames": true,
-      "match_origin_as_fallback": true
+      "match_origin_as_fallback": true,
+      "run_at": "document_idle"
     }
   ],
+  "side_panel": {
+    "default_path": "./src/page/index.html"
+  },
   "action": {
-    "default_popup": "./src/popup/index.html"
+    "default_icon": {}
   }
 }
